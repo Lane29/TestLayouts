@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -11,7 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="64dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -20,51 +21,54 @@
             android:layout_height="match_parent">
 
             <ImageView
-                android:id="@+id/position11"
+                android:id="@+id/card11"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
                 android:layout_marginBottom="16dp"
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
                 android:layout_marginTop="16dp"
-                android:background="@drawable/border"
                 android:scaleType="centerInside"
+                android:tag="1"
                 app:layout_constraintStart_toStartOf="parent"
                 app:srcCompat="@mipmap/ic_launcher"
                 tools:layout_editor_absoluteY="50dp" />
 
             <ImageView
-                android:id="@+id/position12"
+                android:id="@+id/card12"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
                 android:layout_marginBottom="16dp"
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
                 android:layout_marginTop="16dp"
+                android:tag="2"
                 app:srcCompat="@mipmap/ic_launcher"
                 tools:layout_editor_absoluteX="123dp"
                 tools:layout_editor_absoluteY="64dp" />
 
             <ImageView
-                android:id="@+id/position13"
+                android:id="@+id/card13"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
                 android:layout_marginBottom="16dp"
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
                 android:layout_marginTop="16dp"
+                android:tag="3"
                 app:srcCompat="@mipmap/ic_launcher"
                 tools:layout_editor_absoluteX="226dp"
                 tools:layout_editor_absoluteY="95dp" />
 
             <ImageView
-                android:id="@+id/position14"
+                android:id="@+id/card14"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
                 android:layout_marginBottom="16dp"
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
                 android:layout_marginTop="16dp"
+                android:tag="4"
                 app:srcCompat="@mipmap/ic_launcher" />
         </TableRow>
 
@@ -73,49 +77,53 @@
             android:layout_height="match_parent">
 
             <ImageView
-                android:id="@+id/position21"
+                android:id="@+id/card21"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
                 android:layout_marginBottom="16dp"
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
                 android:layout_marginTop="16dp"
+                android:tag="5"
                 app:layout_constraintStart_toStartOf="parent"
                 app:srcCompat="@mipmap/ic_launcher"
                 tools:layout_editor_absoluteY="50dp" />
 
             <ImageView
-                android:id="@+id/position22"
+                android:id="@+id/card22"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
                 android:layout_marginBottom="16dp"
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
                 android:layout_marginTop="16dp"
+                android:tag="6"
                 app:srcCompat="@mipmap/ic_launcher"
                 tools:layout_editor_absoluteX="123dp"
                 tools:layout_editor_absoluteY="64dp" />
 
             <ImageView
-                android:id="@+id/position23"
+                android:id="@+id/card23"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
                 android:layout_marginBottom="16dp"
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
                 android:layout_marginTop="16dp"
+                android:tag="7"
                 app:srcCompat="@mipmap/ic_launcher"
                 tools:layout_editor_absoluteX="226dp"
                 tools:layout_editor_absoluteY="95dp" />
 
             <ImageView
-                android:id="@+id/position24"
+                android:id="@+id/card24"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
                 android:layout_marginBottom="16dp"
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
                 android:layout_marginTop="16dp"
+                android:tag="8"
                 app:srcCompat="@mipmap/ic_launcher" />
         </TableRow>
 
@@ -124,49 +132,53 @@
             android:layout_height="match_parent">
 
             <ImageView
-                android:id="@+id/position31"
+                android:id="@+id/card31"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
                 android:layout_marginBottom="16dp"
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
                 android:layout_marginTop="16dp"
+                android:tag="9"
                 app:layout_constraintStart_toStartOf="parent"
                 app:srcCompat="@mipmap/ic_launcher"
                 tools:layout_editor_absoluteY="50dp" />
 
             <ImageView
-                android:id="@+id/position32"
+                android:id="@+id/card32"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
                 android:layout_marginBottom="16dp"
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
                 android:layout_marginTop="16dp"
+                android:tag="10"
                 app:srcCompat="@mipmap/ic_launcher"
                 tools:layout_editor_absoluteX="123dp"
                 tools:layout_editor_absoluteY="64dp" />
 
             <ImageView
-                android:id="@+id/position33"
+                android:id="@+id/card33"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
                 android:layout_marginBottom="16dp"
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
                 android:layout_marginTop="16dp"
+                android:tag="11"
                 app:srcCompat="@mipmap/ic_launcher"
                 tools:layout_editor_absoluteX="226dp"
                 tools:layout_editor_absoluteY="95dp" />
 
             <ImageView
-                android:id="@+id/position34"
+                android:id="@+id/card34"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
                 android:layout_marginBottom="16dp"
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
                 android:layout_marginTop="16dp"
+                android:tag="12"
                 app:srcCompat="@mipmap/ic_launcher" />
         </TableRow>
 
@@ -174,13 +186,44 @@
 
     <Button
         android:id="@+id/button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_width="155dp"
+        android:layout_height="64dp"
+        android:layout_marginTop="32dp"
         android:onClick="onStartClick"
         android:text="Start again"
+        android:textSize="20sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tableLayout" />
+
+    <TextView
+        android:id="@+id/textTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="32dp"
+        android:text="Time:"
+        android:textColor="@android:color/black"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textMoves"
+        android:layout_width="120dp"
+        android:layout_height="28dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="32dp"
+        android:text="Moves:  "
+        android:textColor="@android:color/black"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.849"
+        app:layout_constraintStart_toStartOf="@+id/textTime"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </android.support.constraint.ConstraintLayout>
