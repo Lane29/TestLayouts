@@ -8,7 +8,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TableLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
@@ -26,13 +28,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private int numberOfCardsInSet = 0;
 
     private int pack[];
-    private int openedCards[];
+    private boolean playedCards[];
+
+    private int openedCardsValues[];
     private int openedCardsPositions[];
 
     private int cntMoves = 0;
     private int timeInMilliseconds = 0;
 
     private MediaPlayer flipMediaPlayer;
+
+    boolean isAnimationInProgress = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +55,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void initGame(){
        // Log.i("info", "initGame...............");
-        //TODO! Read from prefereces. For level 1 of the game there two sets = two mathched cards
         numOfMatchedCards = 2;
         numRows = 3;
         numCols = 4;
@@ -61,10 +66,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         pack = new int[lengthOfPack];   //Array for all cards
         initPackArray();
 
-        openedCards = new int[numOfMatchedCards];   //Array for opened cards
-        initOpenedCardsArray();
+        playedCards = new boolean[lengthOfPack];   //Array for flags for played cards
+        initPlayedCardsArray();
 
-        openedCardsPositions = new int[numOfMatchedCards];   //Array for opened cards
+        openedCardsValues = new int[numOfMatchedCards];   //Array for opened cards
+        initOpenedCardsValuesArray();
+
+        openedCardsPositions = new int[numOfMatchedCards];   //Array for positions of opened cards
         initOpenedCardsPositionsArray();
 
         setOnClickListenerOnImageViews();
@@ -74,6 +82,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         initMoves();
     }
 
+    private void initPlayedCardsArray() {
+        // Log.i("info", "initPlayedCardsArray...............");
+        for (int i = 0; i < lengthOfPack; i++) {
+            playedCards[i] = false;
+        }
+    }
+
+    public void initPackArray(){
+       // Log.i("info", "initPackArray...............");
+        for (int i = 0; i < lengthOfPack; i++) {    //Initialising pack array. For level #1 = [1;2;3;4;5;6;1;2;3;4;5;6]
+            pack[i] = (i + 1) % numberOfCardsInSet + 1;
+        }
+    }
+
+
+    public void initOpenedCardsValuesArray(){
+       /// Log.i("info", "initOpenedCardsValuesArray...............");
+        for (int i = 0; i < numOfMatchedCards; i++) {
+            openedCardsValues[i] = 0;
+        }
+    }
+
+    private void initOpenedCardsPositionsArray() {
+        /// Log.i("info", "initOpenedCardsPositionsArray...............");
+        for (int i = 0; i < numOfMatchedCards; i++) {
+            openedCardsPositions[i] = 0;
+        }
+    }
 
     private void setOnClickListenerOnImageViews() {
         //Log.i("info", "setOnClickListenerOnImageViews...............");
@@ -87,27 +123,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
     }
 
-    public void initPackArray(){
-       // Log.i("info", "initPackArray...............");
-        for (int i = 0; i < lengthOfPack; i++) {    //Initialising pack array. For level #1 = [1;2;3;4;5;6;1;2;3;4;5;6]
-            pack[i] = (i + 1) % numberOfCardsInSet + 1;
-        }
-    }
-
-
-    public void initOpenedCardsArray(){
-       /// Log.i("info", "initOpenedCardsArray...............");
-        for (int i = 0; i < numOfMatchedCards; i++) {
-            openedCards[i] = 0;
-        }
-    }
-
-    private void initOpenedCardsPositionsArray() {
-        /// Log.i("info", "initOpenedCardsPositionsArray...............");
-        for (int i = 0; i < numOfMatchedCards; i++) {
-            openedCardsPositions[i] = 0;
-        }
-    }
 
     public void shuffleCards() {
        // Log.i("info", "shuffleCards...............");
@@ -125,6 +140,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         Log.i("info", "onClick...............");
 
+
         //TODO! Timing
         ///if (timeInMilliseconds == 0) {
             //start timer
@@ -137,54 +153,136 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         Log.i("info", "Position in Pack = " + positionInPack);
 
-        //Make sound
-        flipMediaPlayer = (MediaPlayer) MediaPlayer.create(this, R.raw.memory_flip);
-        flipMediaPlayer.start();
+        if (!isAnimationInProgress) {
 
-        Log.i("info", "image" + pack[positionInPack-1]);
-        //Turn the card face up (name of the target resource looks like "image<X>")
-        int id = getResources().getIdentifier("image" + pack[positionInPack-1], "drawable", getPackageName());
-        clickedCard.setImageResource(id);
+            //Make sound
+            flipMediaPlayer = MediaPlayer.create(this, R.raw.memory_flip);
+            flipMediaPlayer.start();
 
-        //add open card to array openedCards
-        addOpenedCard(positionInPack);
-        for (int i = 0; i < numOfMatchedCards; i++) {
-            Log.i("info", "openedCards[" + i + "] = "+ openedCards[i]);
-        }
+            Log.i("info", "image" + pack[positionInPack - 1]);
+            //Turn the card face up (name of the target resource looks like "image<X>")
+            int id = getResources().getIdentifier("image" + pack[positionInPack - 1], "drawable", getPackageName());
+            clickedCard.setImageResource(id);
 
-
-        if (neededNumberOfCardsIsOpened()) {
-            if (areOpenedCardMatch()) {
-                Log.i("info", "Cards are matched!!! ");
-
-                initOpenedCardsArray();
-                initOpenedCardsPositionsArray();
-
-                MediaPlayer matchMediaPlayer = (MediaPlayer) MediaPlayer.create(this, R.raw.memory_match);
-                matchMediaPlayer.start();
-
-                //clickedCard.animate().translationYBy(-1000f).setDuration(2000);
-
-                //TODO! Animate opened cards
-            } else {
-                Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    public void run() {
-                        initOpenedCardsArray();
-                        initOpenedCardsPositionsArray();
-                        turnAllCardsFaceDown();
-                    }
-                }, 2000);
-
-                flipMediaPlayer.start();
+            //add open card to array openedCards
+            addOpenedCard(positionInPack);
+            for (int i = 0; i < numOfMatchedCards; i++) {
+                Log.i("info", "openedCardsValues[" + i + "] = " + openedCardsValues[i]);
             }
-        }
 
-        cntMoves++;
-        //showGameTime();
-        showMoves();
+
+            if (neededNumberOfCardsIsOpened()) {
+                if (areOpenedCardMatch()) {
+                    Log.i("info", "Cards are matched!!! ");
+
+                    removeMatchedCards();
+                    addPlayedCards();
+
+                    initOpenedCardsValuesArray();
+                    initOpenedCardsPositionsArray();
+
+                    MediaPlayer matchMediaPlayer = MediaPlayer.create(this, R.raw.memory_match);
+                    matchMediaPlayer.start();
+
+                    if (areAllCardsPlayed()) {
+                        Log.i("info", "WIN-WIN-WIN !!!");
+                        removeOnClickListenerOnImageViews();
+                        Toast toast = Toast.makeText(getApplicationContext(), "CONGRATULATIONS!!!", Toast.LENGTH_LONG);
+                        toast.show();
+                    }
+
+                } else {
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        public void run() {
+                            initOpenedCardsValuesArray();
+                            initOpenedCardsPositionsArray();
+                            turnAllCardsFaceDown();
+                        }
+                    }, 2000);
+
+                    flipMediaPlayer.start();
+
+                }
+            }
+
+            cntMoves++;
+            //showGameTime();
+            showMoves();
+        }
+        isAnimationInProgress = false;
+
         Log.i("info", "...");
     }
+
+    private void removeOnClickListenerOnImageViews() {
+        //Log.i("info", "setOnClickListenerOnImageViews...............");
+        //remove onClickListener from each imageView
+        ImageView imageView;
+        for (int i = 1; i <= numRows; i++)
+            for (int j = 1; j <= numCols; j++) {
+                int resID = getResources().getIdentifier("card" + i + j, "id", getPackageName());
+                imageView = findViewById(resID);
+                imageView.setOnClickListener(null);
+            }
+    }
+
+    private boolean areAllCardsPlayed() {
+        boolean res = true;
+        int i=0;
+        while (i < lengthOfPack && res) {
+            if (!playedCards[i]) res = false;
+            i++;
+        }
+        return res;
+    }
+
+    private void addPlayedCards() {
+        for (int i = 0; i < numOfMatchedCards; i++) {
+            int position = openedCardsPositions[i];
+            playedCards[position-1] = true;
+        }
+    }
+
+
+
+    private void removeMatchedCards() {
+        ImageView imageView;
+        for (int i = 0; i < numOfMatchedCards; i++) {
+            Log.i("info", "........removeMatchedCards...openedCardsPositions["+i+"] = " + openedCardsPositions[i]);
+            int resID = getResources().getIdentifier(getCardIDByPosition(openedCardsPositions[i]), "id", getPackageName());
+            imageView = findViewById(resID);
+            imageView.animate().translationXBy(-1000f).setDuration(1000);
+        }
+    }
+
+    private void moveBackAllCards() {
+        Log.i("info", "........moveBackAllCards");
+        ImageView imageView;
+        for (int i = 1; i <= numRows; i++)
+            for (int j =1; j <= numCols; j++) {
+                int resID = getResources().getIdentifier("card" + i + j, "id", getPackageName());
+                imageView = findViewById(resID);
+                imageView.animate().translationXBy(1000f).setDuration(0);
+            }
+    }
+
+    private String getCardIDByPosition(int openedCardsPosition) {
+        Log.i("info", "........getCardIDByPosition...openedCardsPosition = " + openedCardsPosition);
+        int cardCol = openedCardsPosition % numCols;
+        int cardRow = openedCardsPosition / numCols;
+        if (cardCol == 0) {
+            cardCol = numCols;
+        }
+        else {
+            cardRow++;
+        }
+        String cardId = "card" + cardRow + cardCol;
+        Log.i("info", "........getCardIDByPosition...cardId = " + cardId);
+        return cardId;
+    }
+
+
 
     /*private void showGameTime() {
         TextView textTime = (TextView) findViewById(R.id.textTime);
@@ -192,7 +290,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }*/
 
     private void showMoves() {
-        TextView textMoves = (TextView) findViewById(R.id.textMoves);
+        TextView textMoves = findViewById(R.id.textMoves);
         String strMoves = "Moves: " + cntMoves;
         textMoves.setText(strMoves);
     }
@@ -202,7 +300,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         boolean res = true;
         int i=0;
         while (i<numOfMatchedCards && res) {
-            if (openedCards[i] == 0) res = false;
+            if (openedCardsValues[i] == 0) res = false;
             i++;
         }
         return res;
@@ -215,8 +313,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         int i = 1;
         while (i < numOfMatchedCards && res) {
-            if (openedCards[i] != openedCards[i-1]) res = false;
-            Log.i("info", "openedCards[" + i + "] = "+ openedCards[i] + "    i = " + i + "   res = " + res);
+            if (openedCardsValues[i] != openedCardsValues[i-1]) res = false;
+            Log.i("info", "openedCardsValues[" + i + "] = "+ openedCardsValues[i] + "    i = " + i + "   res = " + res);
             i++;
         }
         return res;
@@ -226,8 +324,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void addOpenedCard(int positionInPack) {
         Log.i("info", "addOpenedCard...............pospositionInPackInPack = " + positionInPack);
         int i = 0;
-        while (i<numOfMatchedCards && openedCards[i] != 0) i++;
-        openedCards[i] = pack[positionInPack-1];
+        while (i<numOfMatchedCards && openedCardsValues[i] != 0) i++;
+        openedCardsValues[i] = pack[positionInPack-1];
         openedCardsPositions[i] = positionInPack;
     }
 
@@ -236,26 +334,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onStartClick(View view) {
         //Log.i("info", "onStartClick...............");
         shuffleCards();
-
+        initPlayedCardsArray();
+        moveBackAllCards();
         turnAllCardsFaceDown();
-
-        initOpenedCardsArray();
-
+        initOpenedCardsValuesArray();
         initGameTime();
-
         initMoves();
+        setOnClickListenerOnImageViews();
+
     }
 
     private void initGameTime() {
         timeInMilliseconds = 0;
-        TextView textTime = (TextView) findViewById(R.id.textTime);
+        TextView textTime = findViewById(R.id.textTime);
         String str = "Time: 0 seconds";
         textTime.setText(str);
     }
 
     private void initMoves() {
         cntMoves = 0;
-        TextView textMoves = (TextView) findViewById(R.id.textMoves);
+        TextView textMoves = findViewById(R.id.textMoves);
         String str = "Moves: 0";
         textMoves.setText(str);
     }
