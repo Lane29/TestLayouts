@@ -54,6 +54,10 @@ public class Level2Activity extends AppCompatActivity implements View.OnClickLis
             cardTools.shuffleCards(pack);
 
         turnAllCardsFaceDown();
+
+        Toast toast = Toast.makeText(getApplicationContext(), "Three cards match", Toast.LENGTH_LONG);
+        toast.show();
+
     }
 
     private void initGame(){

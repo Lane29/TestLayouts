@@ -54,6 +54,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         cardTools.shuffleCards(pack);
 
         turnAllCardsFaceDown();
+
+        Toast toast = Toast.makeText(getApplicationContext(), "Two cards match", Toast.LENGTH_LONG);
+        toast.show();
     }
 
     private void initGame(){
