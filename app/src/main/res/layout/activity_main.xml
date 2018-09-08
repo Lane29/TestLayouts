@@ -215,7 +215,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="64dp"
-        android:text="Time:"
+        android:text="Time: 00:00"
         android:textColor="@android:color/black"
         android:textSize="20sp"
         android:textStyle="bold"
