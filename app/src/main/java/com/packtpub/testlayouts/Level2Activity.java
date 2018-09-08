@@ -12,7 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+public class Level2Activity extends AppCompatActivity implements View.OnClickListener {
 
     private int numOfMatchedCards = 0;
 
@@ -41,25 +41,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_level2);
 
-        numOfMatchedCards = 2;
+        numOfMatchedCards = 3;
         numRows = 3;
-        numCols = 4;
+        numCols = 5;
 
         textTime = (TextView) findViewById(R.id.textTime);
-        textTime.setText("Time: 00:00");
+            textTime.setText("Time: 00:00");
 
         initGame();
-        cardTools.shuffleCards(pack);
+            cardTools.shuffleCards(pack);
 
         turnAllCardsFaceDown();
     }
 
     private void initGame(){
         // Log.i("info", "initGame...............");
-        lengthOfPack = numRows * numCols;           //For level #1 = 12 cards are laid
-        numberOfCardsInSet = lengthOfPack / numOfMatchedCards;    //For level #1 = 6 cards in a set
+        lengthOfPack = numRows * numCols;           //For level #2 = 15 cards are laid
+        numberOfCardsInSet = lengthOfPack / numOfMatchedCards;    //For level #2 = 5 cards in a set
 
         //Array for all cards
         pack = cardTools.initPackArray(lengthOfPack, numberOfCardsInSet);
@@ -77,9 +77,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         initTextMoves();
         setOnClickListenerOnImageViews();
         isPlayStarted = false;
-
-        Button buttonStart = findViewById(R.id.button);
-        buttonStart.setTag(0);
     }
 
     private void initTextMoves() {
@@ -155,9 +152,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     isPlayStarted = false;
                     removeOnClickListenerOnImageViews();
                     Button buttonStart = findViewById(R.id.button);
-                    buttonStart.setText("Next level");
+                    buttonStart.setText("Finish game");
                     buttonStart.setTag(1);
-                    //TODO! Winning and moving to next level
+                    //TODO! Winning
                     Toast toast = Toast.makeText(getApplicationContext(), "CONGRATULATIONS!!!", Toast.LENGTH_LONG);
                     toast.show();
                 }
@@ -191,11 +188,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             initTextMoves();
             setOnClickListenerOnImageViews();
             textTime.setText("Time: 00:00");
-        }
-        else {
-            Intent i;
-            i = new Intent(this, Level2Activity.class);
-            startActivity(i);
         }
     }
 
@@ -258,5 +250,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }, 1000); // 1 second
     }
+
 
 }
