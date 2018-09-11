@@ -29,12 +29,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private int openedCardsPositions[];
 
     private int cntMoves = 0;
-    private int timeInMilliseconds = 0;
+   // private int timeInMilliseconds = 0;
 
     private MediaPlayer flipMediaPlayer;
 
     boolean isPlayStarted = false;
     boolean isOpenedCardsValuesArrayInitiated = true;
+    boolean isNeededNumberOfCardsOpened = false;
 
     TextView textTime;
 
@@ -51,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         textTime.setText("Time: 00:00");
 
         initGame();
+
         cardTools.shuffleCards(pack);
 
         turnAllCardsFaceDown();
@@ -135,20 +137,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         //Turn the card face up (name of the target resource looks like "image<X>")
         int id = getResources().getIdentifier("image" + pack[positionInPack - 1], "drawable", getPackageName());
+
+        clickedCard.animate().alpha(0f).scaleX(0.01f).setDuration(1000);
         clickedCard.setImageResource(id);
+
+        clickedCard.animate().alpha(1f).scaleX(1f).setDuration(1000);
+
+
         Log.i("info", "image" + pack[positionInPack - 1]);
 
-        //add position of the opened card to the array openedCards
+        //add position of the opened card to the array openedCards ???????????????????????????????????????????????
         cardTools.addOpenedCard(pack, positionInPack, openedCardsValues, openedCardsPositions, numOfMatchedCards);
 
         if (cardTools.neededNumberOfCardsIsOpened(openedCardsValues, numOfMatchedCards)) {
-            if (cardTools.areOpenedCardMatch(openedCardsValues, numOfMatchedCards)) {
+
+            if (cardTools.areOpenedCardsMatch(openedCardsValues, numOfMatchedCards)) {
                 //Log.i("info", "neededNumberOfCardsIsOpened...Cards are matched!!! ");
                 removeMatchedCards();
+                //
                 cardTools.addPlayedCards(openedCardsPositions, playedCards, numOfMatchedCards);
 
                 openedCardsValues = cardTools.initOpenedCardsValuesArray(numOfMatchedCards);
                 openedCardsPositions = cardTools.initOpenedCardsPositionsArray(numOfMatchedCards);
+
 
                 MediaPlayer matchMediaPlayer = MediaPlayer.create(this, R.raw.memory_match);
                 matchMediaPlayer.start();
@@ -164,7 +175,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Toast toast = Toast.makeText(getApplicationContext(), "CONGRATULATIONS!!!", Toast.LENGTH_LONG);
                     toast.show();
                 }
-            }
+            } //Opened cards don't match, wait 1.5 sec and close cards automatically
             else {
                 Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
@@ -172,6 +183,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         openedCardsValues = cardTools.initOpenedCardsValuesArray(numOfMatchedCards);
                         openedCardsPositions = cardTools.initOpenedCardsPositionsArray(numOfMatchedCards);
                         turnAllCardsFaceDown();
+
                     }
                 }, 1500);
                 flipMediaPlayer.start();

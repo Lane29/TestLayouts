@@ -140,7 +140,7 @@ public class Level2Activity extends AppCompatActivity implements View.OnClickLis
         cardTools.addOpenedCard(pack, positionInPack, openedCardsValues, openedCardsPositions, numOfMatchedCards);
 
         if (cardTools.neededNumberOfCardsIsOpened(openedCardsValues, numOfMatchedCards)) {
-            if (cardTools.areOpenedCardMatch(openedCardsValues, numOfMatchedCards)) {
+            if (cardTools.areOpenedCardsMatch(openedCardsValues, numOfMatchedCards)) {
                 //Log.i("info", "neededNumberOfCardsIsOpened...Cards are matched!!! ");
                 removeMatchedCards();
                 cardTools.addPlayedCards(openedCardsPositions, playedCards, numOfMatchedCards);

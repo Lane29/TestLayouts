@@ -101,8 +101,8 @@ public class cardTools {
         return res;
     }
 
-    public static boolean areOpenedCardMatch(int[] openedCardsValues, int numOfMatchedCards) {
-        //Log.i("info", "areOpenedCardMatch...............");
+    public static boolean areOpenedCardsMatch(int[] openedCardsValues, int numOfMatchedCards) {
+        //Log.i("info", "areOpenedCardsMatch...............");
         boolean res = true;
         int i = 1;
         while (i < numOfMatchedCards && res) {
