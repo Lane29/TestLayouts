@@ -193,6 +193,11 @@ public class Level2Activity extends AppCompatActivity implements View.OnClickLis
             setOnClickListenerOnImageViews();
             textTime.setText("Time: 00:00");
         }
+        else {
+            Intent i;
+            i = new Intent(this, MainActivity.class);
+            startActivity(i);
+        }
     }
 
     private void removeMatchedCards() {

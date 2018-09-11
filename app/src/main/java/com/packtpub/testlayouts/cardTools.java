@@ -134,4 +134,17 @@ public class cardTools {
         if (seconds < 10) addSeconds = "0";
         return addMinutes + minutes + ":" + addSeconds + seconds;
     }
+
+    public static boolean isClickedCardAlreadyOpened(int[] openedCardsPositions, int positionInPack) {
+        boolean res = true;
+        int i = 0;
+        Log.i("info", "isClickedCardAlreadyOpened...............positionInPack = " + positionInPack);
+        while (i < openedCardsPositions.length   &&   openedCardsPositions[i] != positionInPack) {
+            i++;
+            res = false;
+        }
+        Log.i("info", "isClickedCardAlreadyOpened...............res = " + res);
+
+        return res;
+    }
 }
