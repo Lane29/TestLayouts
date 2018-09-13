@@ -2,6 +2,7 @@ package com.packtpub.testlayouts;
 
 import android.content.Intent;
 import android.media.MediaPlayer;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,7 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class Level2Activity extends AppCompatActivity implements View.OnClickListener {
+public class Level2Activity extends AppCompatActivity implements View.OnClickListener{
 
     private int numOfMatchedCards = 0;
 
@@ -29,14 +30,23 @@ public class Level2Activity extends AppCompatActivity implements View.OnClickLis
     private int openedCardsPositions[];
 
     private int cntMoves = 0;
-    private int timeInMilliseconds = 0;
+    // private int timeInMilliseconds = 0;
 
     private MediaPlayer flipMediaPlayer;
+    private MediaPlayer matchMediaPlayer;
 
     boolean isPlayStarted = false;
     boolean isOpenedCardsValuesArrayInitiated = true;
 
+    //True - if a card is turned, False - if a card is on its edge
+    boolean isCardOnItsEdge;
+    boolean isCardFaceDown;
+
+    ImageView cardToFlip;
+
     TextView textTime;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,16 +58,20 @@ public class Level2Activity extends AppCompatActivity implements View.OnClickLis
         numCols = 5;
 
         textTime = (TextView) findViewById(R.id.textTime);
-            textTime.setText("Time: 00:00");
+        textTime.setText("Time: 00:00");
+
+
+        flipMediaPlayer = MediaPlayer.create(this, R.raw.memory_flip);
+        matchMediaPlayer = MediaPlayer.create(this, R.raw.memory_match);
 
         initGame();
-            cardTools.shuffleCards(pack);
 
-        turnAllCardsFaceDown();
+        cardTools.shuffleCards(pack);
 
-        Toast toast = Toast.makeText(getApplicationContext(), "Three cards match", Toast.LENGTH_LONG);
+        showAllCardsFaceDown();
+
+        Toast toast = Toast.makeText(getApplicationContext(), "Find every " + numOfMatchedCards + " matched cards", Toast.LENGTH_LONG);
         toast.show();
-
     }
 
     private void initGame(){
@@ -81,6 +95,9 @@ public class Level2Activity extends AppCompatActivity implements View.OnClickLis
         initTextMoves();
         setOnClickListenerOnImageViews();
         isPlayStarted = false;
+
+        Button buttonStart = findViewById(R.id.button);
+        buttonStart.setTag(0);
     }
 
     private void initTextMoves() {
@@ -117,81 +134,86 @@ public class Level2Activity extends AppCompatActivity implements View.OnClickLis
     public void onClick(View view) {
         Log.i("info", "onClick...............");
 
+        //Start timer when user starts playing
         if (!isPlayStarted){
             setTimer();
             isPlayStarted = true;
         }
+
         ImageView clickedCard = (ImageView) view;
 
         //Position of the clicked card in a whole pack
         int positionInPack = Integer.parseInt(clickedCard.getTag().toString());
-        Log.i("info", "Position in Pack = " + positionInPack);
+        Log.i("info", "onClick...............Position in Pack = " + positionInPack);
 
-        //Make sound
-        flipMediaPlayer = MediaPlayer.create(this, R.raw.memory_flip);
-        flipMediaPlayer.start();
+        //Check whether user tried to open the card while needed numer of cards are already opened
+        //Or user clicked on the already opened card
+        if (!cardTools.neededNumberOfCardsIsOpened(openedCardsValues, numOfMatchedCards)&&
+                !cardTools.isClickedCardAlreadyOpened(openedCardsPositions, positionInPack)) {
+            isCardFaceDown = true;
+            isCardOnItsEdge = false;
 
-        //Turn the card face up (name of the target resource looks like "image<X>")
-        int id = getResources().getIdentifier("image" + pack[positionInPack - 1], "drawable", getPackageName());
-        clickedCard.setImageResource(id);
-        Log.i("info", "image" + pack[positionInPack - 1]);
+            flipCard(clickedCard);
+            Log.i("info", "image" + pack[positionInPack - 1]);
 
-        //add position of the opened card to the array openedCards
-        cardTools.addOpenedCard(pack, positionInPack, openedCardsValues, openedCardsPositions, numOfMatchedCards);
+            cntMoves++;
+            showMoves();
+            //add position of the opened card to the array openedCards
+            cardTools.addOpenedCard(pack, positionInPack, openedCardsValues, openedCardsPositions, numOfMatchedCards);
 
-        if (cardTools.neededNumberOfCardsIsOpened(openedCardsValues, numOfMatchedCards)) {
-            if (cardTools.areOpenedCardsMatch(openedCardsValues, numOfMatchedCards)) {
-                //Log.i("info", "neededNumberOfCardsIsOpened...Cards are matched!!! ");
-                removeMatchedCards();
-                cardTools.addPlayedCards(openedCardsPositions, playedCards, numOfMatchedCards);
+            if (cardTools.neededNumberOfCardsIsOpened(openedCardsValues, numOfMatchedCards)) {
+                if (cardTools.areOpenedCardsMatch(openedCardsValues, numOfMatchedCards)) {
+                    Log.i("info", "onClick...Cards are matched!!! ");
 
-                openedCardsValues = cardTools.initOpenedCardsValuesArray(numOfMatchedCards);
-                openedCardsPositions = cardTools.initOpenedCardsPositionsArray(numOfMatchedCards);
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        public void run() {
+                            matchMediaPlayer.start();
+                            removeMatchedCards();
 
-                MediaPlayer matchMediaPlayer = MediaPlayer.create(this, R.raw.memory_match);
-                matchMediaPlayer.start();
+                            cardTools.addPlayedCards(openedCardsPositions, playedCards, numOfMatchedCards);
 
-                if (cardTools.areAllCardsPlayed(playedCards, lengthOfPack)) {
-                    Log.i("info", "WIN-WIN-WIN !!!");
-                    isPlayStarted = false;
-                    removeOnClickListenerOnImageViews();
-                    Button buttonStart = findViewById(R.id.button);
-                    buttonStart.setText("Finish game");
-                    buttonStart.setTag(1);
-                    //TODO! Winning
-                    Toast toast = Toast.makeText(getApplicationContext(), "CONGRATULATIONS!!!", Toast.LENGTH_LONG);
-                    toast.show();
+                            openedCardsValues = cardTools.initOpenedCardsValuesArray(numOfMatchedCards);
+                            openedCardsPositions = cardTools.initOpenedCardsPositionsArray(numOfMatchedCards);
+
+                            if (cardTools.areAllCardsPlayed(playedCards, lengthOfPack)) {
+                                Log.i("info", "WIN-WIN-WIN !!!");
+                                isPlayStarted = false;
+                                removeOnClickListenerOnImageViews();
+                                Button buttonStart = findViewById(R.id.button);
+                                buttonStart.setText("Finish game");
+                                buttonStart.setTag(1); //In level 2 tag=1 means go to the menu instead of re-start the game when tag=0
+                                Toast toast = Toast.makeText(getApplicationContext(), "CONGRATULATIONS!!!", Toast.LENGTH_LONG);
+                                toast.show();
+                            }
+                        }
+                    }, MainActivity.flipTimeMsc*4);
+                } //Opened cards don't match, wait 2 sec and close cards automatically
+                else {
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        public void run() {
+                            flipOpenedCards();
+                        }
+                    }, MainActivity.flipTimeMsc*4);
                 }
             }
-            else {
-                Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    public void run() {
-                        openedCardsValues = cardTools.initOpenedCardsValuesArray(numOfMatchedCards);
-                        openedCardsPositions = cardTools.initOpenedCardsPositionsArray(numOfMatchedCards);
-                        turnAllCardsFaceDown();
-                    }
-                }, 1500);
-                flipMediaPlayer.start();
-            }
         }
-
-        cntMoves++;
-        showMoves();
     }
 
     //Re-start the game
     public void onStartClick(View view) {
-        Log.i("info", "onStartClick...............");
+        Log.i("info", "onStartClick..............."+view.getTag().toString());
         if (view.getTag().toString().equals("0")) {
             cardTools.shuffleCards(pack);
-            playedCards = cardTools.initPlayedCardsArray(lengthOfPack);
             moveBackAllCards();
-            turnAllCardsFaceDown();
+            showAllCardsFaceDown();
+            playedCards = cardTools.initPlayedCardsArray(lengthOfPack);
             openedCardsValues = cardTools.initOpenedCardsValuesArray(numOfMatchedCards);
             initTextMoves();
             setOnClickListenerOnImageViews();
             textTime.setText("Time: 00:00");
+            isPlayStarted = false;
         }
         else {
             Intent i;
@@ -206,19 +228,27 @@ public class Level2Activity extends AppCompatActivity implements View.OnClickLis
             Log.i("info", "........removeMatchedCards...openedCardsPositions["+i+"] = " + openedCardsPositions[i]);
             int resID = getResources().getIdentifier(cardTools.getCardIDByPosition(openedCardsPositions[i], numCols), "id", getPackageName());
             imageView = findViewById(resID);
-            imageView.animate().translationXBy(-1000f).setDuration(1000);
+            imageView.animate().translationXBy(-2000f).setDuration(1000);
         }
     }
 
     private void moveBackAllCards() {
         Log.i("info", "........moveBackAllCards");
         ImageView imageView;
-        for (int i = 1; i <= numRows; i++)
-            for (int j =1; j <= numCols; j++) {
+        int positionToMoveBack, i, j;
+/*        for (int i = 1; i <= numRows; i++)
+            for (int j =1; j <= numCols; j++) {*/
+        for (int n = 0; n < playedCards.length; n++) {
+            if (playedCards[n]) {
+                positionToMoveBack = n + 1;
+                i = cardTools.getCardRowByPosition(positionToMoveBack, numCols);
+                j = cardTools.getCardColByPosition(positionToMoveBack, numCols);
+                Log.i("info", "moveBackAllCards......................card" + i + j);
                 int resID = getResources().getIdentifier("card" + i + j, "id", getPackageName());
                 imageView = findViewById(resID);
-                imageView.animate().translationXBy(1000f).setDuration(0);
+                imageView.animate().translationXBy(2000f).setDuration(0);
             }
+        }
     }
 
     private void showMoves() {
@@ -228,19 +258,95 @@ public class Level2Activity extends AppCompatActivity implements View.OnClickLis
     }
 
     //Turn all cards face down
-    private void turnAllCardsFaceDown() {
+    private void showAllCardsFaceDown() {
         ///Log.i("info", "turnAllCardsFaceDown...............");
         for (int i = 1; i <= numRows; i++)
-            for (int j =1; j <= numCols; j++)  turnCardFaceDown(i, j);
+            for (int j = 1; j <= numCols; j++)  showCardFaceDown(i, j);
     }
 
-    private void turnCardFaceDown(int i, int j) {
-        ///Log.i("info", "turnCardFaceDown...............");
+    private void showCardFaceDown(int i, int j) {
+        ///Log.i("info", "showCardFaceDown...............");
         int resID = getResources().getIdentifier("card" + i + j, "id", getPackageName());
         ImageView imageView = findViewById(resID);
-
-        int id = getResources().getIdentifier("square", "drawable", getPackageName());
+        int id = getResources().getIdentifier("bw", "drawable", getPackageName());
         imageView.setImageResource(id);
+    }
+
+    //Turn only opened cards face down
+    private void flipOpenedCards() {
+        Log.i("info", "flipOpenedCards...............");
+        isCardFaceDown = false;
+        isCardOnItsEdge = false;
+        CountDownTimer timer = new CountDownTimer(MainActivity.flipTimeMsc*4, MainActivity.flipTimeMsc*2) {
+            @Override
+            public void onTick(long l) {
+                float scaleXValue = 1f; //Default value - for turning fully
+
+                //if the card flipped than we need to put it on the edge
+                if (!isCardOnItsEdge) scaleXValue = 0.01f;
+
+                for (int n = 0; n < openedCardsPositions.length; n++) {
+                    int i = cardTools.getCardRowByPosition(openedCardsPositions[n], numCols);
+                    int j = cardTools.getCardColByPosition(openedCardsPositions[n], numCols);
+                    int resID = getResources().getIdentifier("card" + i + j, "id", getPackageName());
+                    Log.i("info", "flipOpenedCards...............n = " + n + "...card" + i + j);
+
+                    cardToFlip = findViewById(resID);
+                    //if the card on its edge - it's the time to change image and then turn it
+                    if (isCardOnItsEdge) cardToFlip.setImageResource(R.drawable.bw);
+
+                    //Make sound
+                    flipMediaPlayer.start();
+                    cardToFlip.animate().scaleX(scaleXValue).setDuration(MainActivity.flipTimeMsc);
+                }
+                if (!isCardOnItsEdge) isCardOnItsEdge = true;
+            }
+
+            @Override
+            public void onFinish() {
+                openedCardsValues = cardTools.initOpenedCardsValuesArray(numOfMatchedCards);
+                openedCardsPositions = cardTools.initOpenedCardsPositionsArray(numOfMatchedCards);
+            }
+        };
+        timer.start();
+    }
+
+    private void flipCard(ImageView card){
+        Log.i("info", "flipCard...............");
+        cardToFlip = card;
+        CountDownTimer timer = new CountDownTimer(MainActivity.flipTimeMsc*4, MainActivity.flipTimeMsc*2) {
+            @Override
+            public void onTick(long l) {
+                Log.i("info", "flipCard...............onTick");
+                float scaleXValue = 1f; //Default value - for turning to flat position
+
+                //if the card already flipped than it will be turned on to its edge
+                if (!isCardOnItsEdge) {
+                    isCardOnItsEdge = true;
+                    scaleXValue = 0.01f;
+                } else {//if the card on its edge - it's the time to change image and then turn it
+                    if (isCardFaceDown) {
+                        //Turn the card face up (name of the target resource looks like "image<X>")
+                        int positionInPack = Integer.parseInt(cardToFlip.getTag().toString());
+                        int id = getResources().getIdentifier("image" + pack[positionInPack - 1], "drawable", getPackageName());
+                        cardToFlip.setImageResource(id);
+                        isCardFaceDown = false;
+                    } else {
+                        cardToFlip.setImageResource(R.drawable.bw);
+                        isCardFaceDown = true;
+                    }
+                }
+                //Make sound
+                flipMediaPlayer.start();
+                cardToFlip.animate().scaleX(scaleXValue).setDuration(MainActivity.flipTimeMsc);
+            }
+
+            @Override
+            public void onFinish() {
+            }
+        };
+        Log.i("info", "flipCard...............before start");
+        timer.start();
     }
 
     private void setTimer() {
@@ -254,11 +360,11 @@ public class Level2Activity extends AppCompatActivity implements View.OnClickLis
                 time += 1000;
                 if (isPlayStarted) {
                     textTime.setText("Time: " + cardTools.getTextTime(time));
+                    h.postDelayed(this, 1000);
                 }
-                h.postDelayed(this, 1000);
+                else h.removeCallbacks(this);
             }
         }, 1000); // 1 second
     }
-
 
 }

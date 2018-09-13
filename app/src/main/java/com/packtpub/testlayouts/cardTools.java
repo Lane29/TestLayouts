@@ -90,8 +90,25 @@ public class cardTools {
         return cardId;
     }
 
+    public static int getCardRowByPosition(int openedCardsPosition, int numCols) {
+        Log.i("info", "........getCardRowByPosition...openedCardsPosition = " + openedCardsPosition);
+        int cardCol = openedCardsPosition % numCols;
+        int cardRow = openedCardsPosition / numCols;
+        if (cardCol != 0) cardRow++;
+        Log.i("info", "........getCardRowByPosition...cardRow = " + cardRow);
+        return cardRow;
+    }
+
+    public static int getCardColByPosition(int openedCardsPosition, int numCols) {
+        Log.i("info", "........getCardColByPosition...openedCardsPosition = " + openedCardsPosition);
+        int cardCol = openedCardsPosition % numCols;
+        if (cardCol == 0) cardCol = numCols;
+        Log.i("info", "........getCardRowByPosition...cardCol = " + cardCol);
+        return cardCol;
+    }
+
     public static boolean neededNumberOfCardsIsOpened(int[] openedCardsValues, int numOfMatchedCards) {
-        //Log.i("info", "neededNumberOfCardsIsOpened...............");
+        Log.i("info", "neededNumberOfCardsIsOpened...............Yes!!!!");
         boolean res = true;
         int i = 0;
         while (i<numOfMatchedCards && res) {

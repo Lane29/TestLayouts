@@ -8,6 +8,8 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static int flipTimeMsc = 200;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,5 +27,11 @@ public class MainActivity extends AppCompatActivity {
         //TODO! Results page
         Toast toast = Toast.makeText(getApplicationContext(), "Results are really great!!!", Toast.LENGTH_LONG);
         toast.show();
+    }
+
+    public void onRulesClick(View view) {
+        Intent i;
+        i = new Intent(this, RulesActivity.class);
+        startActivity(i);
     }
 }
